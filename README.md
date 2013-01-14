@@ -2,6 +2,10 @@
 
 Chrome extension allowing downloads of YouTube videos.
 
+## Usage
+
+Click the button next to a video title to download.
+
 ## Installation
 
 Drag-and-drop the *YouTube-To-Drive.crx* file into your Chrome extensions.
