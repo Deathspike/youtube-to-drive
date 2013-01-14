@@ -6,7 +6,7 @@ Chrome extension allowing downloads of YouTube videos.
 
 Drag-and-drop the *YouTube-To-Drive.crx* file into your Chrome extensions.
 
-### Building
+## Building
 
 Create a package in Chrome and point it at the lib folder.
 
