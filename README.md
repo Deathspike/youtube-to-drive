@@ -1,19 +1,22 @@
-# youtube-to-drive
+# Youtube-To-Drive
 
-Chrome extension allowing downloads of YouTube videos.
+Extension for Chrome enabling YouTube content to be stored to your drive.
 
-## Usage
+## Quick Installation
 
-Click the button next to a video title to download.
+Basic installation enables storage of video files.
 
-## Installation
+	1. Start the Chrome browser.
+	2. Start the Extensions manager (Settings -> Extensions).
+	3. Drag-and-drop the 'lib.crx' file into the Extensions manager.
+	4. Accept the required permissions.
 
-Drag-and-drop the *YouTube-To-Drive.crx* file into your Chrome extensions.
+## Advanced Installation
 
-## Building
+Basic installation enables storage of music files.
 
-Create a package in Chrome and point it at the lib folder.
-
-## Motivation
-
-Downloading videos is as straightforward as adding a single HTTP header. Keep it simple.
+	1. Download the 'srv' folder. This is the music server.
+	2. Install nodejs (http://nodejs.org/).
+	3. Install ffmpeg (http://ffmpeg.org/), or place in 'srv' folder.
+	4. Start the music server with 'node app', or run the .bat.
+	5. Start, or restart, Chrome.

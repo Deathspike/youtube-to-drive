@@ -3,11 +3,11 @@
 	"description": "Written by Roel van Uden.",
 	"name": "YouTube-To-Drive",
 	"manifest_version": 2,
-	"version": "1.0",
+	"version": "1.1",
 
 	// Content Information
 	"background": {
-		"scripts": ["background.js"]
+		"scripts": ["jquery-1.9.0.min.js", "background.js"]
 	},
 	"content_scripts": [{
 		"js": ["foreground.js"],
@@ -16,7 +16,8 @@
 	"permissions": [
 		"webRequest",
 		"webRequestBlocking",
-		"http://*.youtube.com/*"
+		"http://*.youtube.com/*",
+		"http://localhost:7974/*"
 	],
 
 	// Visual Information
@@ -24,8 +25,5 @@
 		"16": "icon-16.png",
 		"48": "icon-48.png",
 		"128": "icon-128.png"
-	},
-	"web_accessible_resources": [
-		"icon-24.png"
-	]
+	}
 }
