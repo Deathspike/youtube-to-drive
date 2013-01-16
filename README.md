@@ -13,7 +13,7 @@ Basic installation enables storage of video files.
 
 ## Advanced Installation
 
-Basic installation enables storage of music files.
+Advanced installation enables storage of music files.
 
 	1. Download the 'srv' folder. This is the music server.
 	2. Install nodejs (http://nodejs.org/).
