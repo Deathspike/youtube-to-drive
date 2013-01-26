@@ -26,14 +26,16 @@ app.get('/:name/:url', function(req, res) {
 		res.set('Transfer-Encoding', 'chunked');
 		// Write the ID3 tag.
 		res.write('ID3');
-		// Request the video file.
+		// Request the video file and wait for the stream to close.
 		request(address).pipe(fs.createWriteStream(input)).on('close', function() {
-			// Convert the video file.
-			exec('ffmpeg -i "' + input + '" -vn -f mp3 -ab 192k "' + output + '"', function() {
+			// Create a process and convert the video file.
+			var process = exec('ffmpeg -i "' + input + '" -vn -f mp3 -ab 192k "' + output + '"');
+			// Wait for the process to exit.
+			process.on('exit', function(error) {
 				// Create a stream to the music file, skipping the ID3 tag.
 				var stream = fs.createReadStream(output, {start: 3});
-				// Wait for the stream to end.
-				stream.on('end', function() {
+				// Wait for the stream to close.
+				stream.on('close', function() {
 					// Unlink the input file.
 					fs.unlinkSync(input);
 					// Unlink the output.
