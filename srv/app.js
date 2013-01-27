@@ -32,17 +32,39 @@ app.get('/:name/:url', function(req, res) {
 			var process = exec('ffmpeg -i "' + input + '" -vn -f mp3 -ab 192k "' + output + '"');
 			// Wait for the process to exit.
 			process.on('exit', function(error) {
-				// Create a stream to the music file, skipping the ID3 tag.
-				var stream = fs.createReadStream(output, {start: 3});
-				// Wait for the stream to close.
-				stream.on('close', function() {
+				// Check if an error has occured.
+				if (error) {
+					// End the response.
+					res.end();
 					// Unlink the input file.
 					fs.unlinkSync(input);
 					// Unlink the output.
 					fs.unlinkSync(output);
-				});
-				// Forward the file to the response.
-				stream.pipe(res);
+				} else {
+					// Define the pipe stream to response function.
+					var pipeStreamToResponse = function() {
+						// Create a stream to the music file, skipping the ID3 tag.
+						var stream = fs.createReadStream(output, {start: 3});
+						// Wait for an error to occur.
+						stream.on('error', function() {
+							// Set a time out and attempt again.
+							setTimeout(pipeStreamToResponse, 500);
+						});
+						// Wait for the stream to close.
+						stream.on('close', function() {
+							// End the response.
+							res.end();
+							// Unlink the input file.
+							fs.unlinkSync(input);
+							// Unlink the output.
+							fs.unlinkSync(output);
+						});
+						// Forward the file to the response.
+						stream.pipe(res, {end: false});
+					};
+					// Pipe the stream to the response.
+					pipeStreamToResponse();
+				}
 			});
 		});
 	}
