@@ -3,7 +3,7 @@
 	"description": "Written by Roel van Uden.",
 	"name": "YouTube-To-Drive",
 	"manifest_version": 2,
-	"version": "1.2",
+	"version": "1.3",
 
 	// Content Information
 	"background": {
@@ -11,7 +11,8 @@
 	},
 	"content_scripts": [{
 		"js": ["foreground.js"],
-		"matches": ["http://www.youtube.com/watch*", "https://www.youtube.com/watch*"]
+		"matches": ["http://www.youtube.com/watch*", "https://www.youtube.com/watch*"],
+		"run_at": "document_end"
 	}],
 	"permissions": [
 		"webRequest",
