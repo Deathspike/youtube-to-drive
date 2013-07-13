@@ -1,96 +1,69 @@
 (function () {
 	// Initialize strict mode.
 	"use strict";
-	// Initialize the express application.
-	var app = require('express')();
-	// Initialize the child process module and retrieve the exec function.
+	// Initialize the exec function.
 	var exec = require('child_process').exec;
-	// Initialize the file system module.
+	// Initialise the fs module.
 	var fs = require('fs');
-	// Initialize the request module.
-	var request = require('request');
-	// Set the download handler.
-	app.get('/:name/:url', function (req, res) {
-		// Decode the address.
-		var address = decodeURIComponent(req.params.url);
-		// Check if the address is somewhat valid.
-		if (!address.match(/^http:\/\/([\S]+)\.youtube\.com\//i)) {
-			// Stop the function.
-			return;
-		}
-		// Initialize the current time.
-		var currentTime = new Date().getTime();
-		// Initialize the input.
-		var input = 'working/' + currentTime + '.mp4';
-		// Initialize the output.
-		var output = 'working/' + currentTime + '.mp3';
-		// Initialize the name.
-		var name = encode(decodeURIComponent(req.params.name));
-		// Write the content disposition.
-		res.set('Content-Disposition', 'attachment; filename*=UTF-8\'\'' + name + '.mp3');
-		// Write the Content-Type header to indicate the file type.
-		res.set('Content-Type', 'audio/mpeg');
-		// Write the Transfer-Encoding header to indicate a chunked file.
-		res.set('Transfer-Encoding', 'chunked');
-		// Write the ID3 tag.
-		res.write('ID3');
-		// Request the video file ...
-		request(address).pipe(fs.createWriteStream(input))
-			// ... and wait for the stream to close.
-			.on('close', function () {
-			// Create a process and convert the video file.
-			var process = exec('ffmpeg -i "' + input + '" -vn -f mp3 -ab 192k "' +  output + '"');
-			// Wait for the process to exit.
-			process.on('exit', function (error) {
-				// Check if an error has occured.
-				if (error) {
-					// End the response.
-					res.end();
-					// Unlink the input file.
-					fs.unlinkSync(input);
-					// Unlink the output.
-					fs.unlinkSync(output);
-				} else {
-					// Define the pipe stream to response function.
-					var pipeStreamToResponse = function () {
-						// Create a stream to the music file (skip ID3).
-						var stream = fs.createReadStream(output, {start: 3});
-						// Wait for an error to occur.
-						stream.on('error', function () {
-							// Set a time out and attempt again.
-							setTimeout(pipeStreamToResponse, 500);
+	// Initialise the http module.
+	var http = require('http');
+	// Initialize the match variable.
+	var match;
+
+	// ==================================================
+	//                    S E R V E R
+	// ==================================================
+
+	// Create the server and listen for requests on port 7974.
+	http.createServer(function (req, res) {
+		// Check if the music request match is invalid.
+		if ((match = req.url.match(/^\/([\w\W]*?)\/([\w\W]*)$/)) === null) {
+			// Set the content-type header.
+			res.setHeader('Content-Type', 'application/json');
+			// Send the response.
+			res.end('{"alive": true}');
+		} else {
+			// Set the content disposition header.
+			res.setHeader('Content-Disposition', 'attachment; filename*=UTF-8\'\'' + match[1].replace('\'', '%27') + '.mp3');
+			// Set the content type header.
+			res.setHeader('Content-Type', 'audio/mpeg');
+			// Set the transfer encoding header.
+			res.setHeader('Transfer-Encoding', 'chunked');
+			// Write the ID3 tag.
+			res.write('ID3');
+			// Open a stream to the video resource.
+			http.get(match[2], function (downloadStream) {
+				// Initialize the path to the music file.
+				var music = 'working/' + new Date().getTime() + '.mp3';
+				// Initialize the path to the video file.
+				var video = 'working/' + new Date().getTime() + '.mp4';
+				// Open a stream to the video file.
+				var videoStream = fs.createWriteStream(video);
+				// Wait for data on the download stream.
+				downloadStream.on('data', function (buffer) {
+					// Write the chunk of data to the video stream.
+					videoStream.write(buffer);
+				});
+				// Wait for the download stream to end.
+				downloadStream.on('end', function () {
+					// End the video stream.
+					videoStream.end();
+					// Convert the video file to a music file with ffmpeg.
+					exec('ffmpeg -i "' + video + '" -vn -f mp3 -ab 192k "' + music + '"').on('exit', function () {
+						// Open a stream to the music file.
+						var musicStream = fs.createReadStream(music, {start: 3});
+						// Wait for the music stream to close.
+						musicStream.on('close', function () {
+							// Unlink the music file.
+							fs.unlinkSync(music);
+							// Unlink the video file.
+							fs.unlinkSync(video);
 						});
-						// Wait for the stream to close.
-						stream.on('close', function () {
-							// End the response.
-							res.end();
-							// Unlink the input file.
-							fs.unlinkSync(input);
-							// Unlink the output.
-							fs.unlinkSync(output);
-						});
-						// Forward the file to the response.
-						stream.pipe(res, {end: false});
-					};
-					// Pipe the stream to the response.
-					pipeStreamToResponse();
-				}
+						// Pipe the music stream to the response.
+						musicStream.pipe(res);
+					});
+				});
 			});
-		});
-	});
-	// Set the ping handler.
-	app.get('/ping', function (req, res) {
-		// Send pong.
-		res.json({pong: true});
-	});
-	// Listen for requests.
-	app.listen(7974);
-	
-	// Encode an Uniform Resource Identifier (URI) component.
-	function encode(str) {
-		// Initialize the encoded string.
-		var encoded = encodeURIComponent(str);
-		// Encode the omitted characters.
-		return encoded.replace(/[!'()]/g, escape).replace(/\*/g, "%2A");
-	}
+		}
+	}).listen(7974);
 }());
