@@ -3,7 +3,7 @@
 	"description": "Written by Roel van Uden.",
 	"name": "YouTube-To-Drive",
 	"manifest_version": 2,
-	"version": "1.3.7",
+	"version": "1.3.8",
 
 	// Content Information
 	"background": {
@@ -17,6 +17,7 @@
 	"permissions": [
 		"webRequest",
 		"webRequestBlocking",
+		"http://*.googlevideo.com/*", "https://*.googlevideo.com/*",
 		"http://*.youtube.com/*", "https://*.youtube.com/*",
 		"http://localhost:7974/*", "https://localhost:7974/*"
 	],
