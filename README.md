@@ -8,7 +8,7 @@ Basic installation enables storage of video files.
 
 	1. Start the Chrome browser.
 	2. Start the Extensions manager (Settings -> Extensions).
-	3. Drag-and-drop the 'lib.crx' file into the Extensions manager.
+	3. Drag-and-drop the 'lib.crx' or 'lib.live.crx' file into the Extensions manager.
 	4. Accept the required permissions.
 
 ## Advanced Installation
