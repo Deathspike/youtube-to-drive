@@ -8,6 +8,8 @@ var exec = require('child_process').exec;
 var fs = require('fs');
 // Initialise the http module.
 var http = require('http');
+// Initialise the https module.
+var https = require('https');
 // Initialize the match variable.
 var match;
 
@@ -44,7 +46,7 @@ http.createServer(function (req, res) {
 // Download a music file.
 var download = function (clientStream, location) {
 	// Open a stream to the video resource.
-	http.get(location, function (inputStream) {
+	(/^https/.test(location) ? https : http).get(location, function (inputStream) {
 		// Check if the server has answered with a redirect.
 		if (inputStream.headers && inputStream.headers.location) {
 			// Follow the redirect instruction.
